@@ -1,0 +1,6 @@
+; $Id:
+name=Text CAPTCHA
+description=Uses the textcaptcha.com service for accessible CAPTCHAs
+package="Spam control"
+dependencies[]=captcha
+core=6.x
