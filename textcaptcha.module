@@ -111,7 +111,7 @@ function textcaptcha_get_captcha($use_cache = TRUE) {
     $cached_challenges = cache_get('textcaptcha_cached_challenges');
     $captcha = drupal_http_request(TEXTCAPTCHA_URL_PREFIX . trim(variable_get('textcaptcha_api_key', '')));
     if ($captcha->code == '200' && $captcha->data) {
-      $parser = drupal_xml_parser_create();
+      $parser = drupal_xml_parser_create($captcha->data);
       $captcha_xml = array();
       xml_parse_into_struct($parser, $captcha->data, $captcha_xml);
       $answers = array();
