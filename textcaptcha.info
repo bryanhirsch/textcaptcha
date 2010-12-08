@@ -3,4 +3,5 @@ name=Text CAPTCHA
 description=Uses the textcaptcha.com service for accessible CAPTCHAs
 package="Spam control"
 dependencies[]=captcha
-core=6.x
+configure = admin/config/people/captcha/textcaptcha
+core=7.x

@@ -13,14 +13,14 @@ define('TEXTCAPTCHA_URL_PREFIX', 'http://textcaptcha.com/api/');
 */
 function textcaptcha_menu() {
   $items = array();
-    $items['admin/user/captcha/textcaptcha'] = array(
-      'title' => 'Text CAPTCHA',
-      'description' => 'Builds CAPTCHAs that use text rather than images.',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('textcaptcha_settings_form'),
-      'access arguments' => array('administer CAPTCHA settings'),
-      'type' => MENU_LOCAL_TASK
-    );
+  $items['admin/config/people/captcha/textcaptcha'] = array(
+    'title' => 'Text CAPTCHA',
+    'description' => 'Builds CAPTCHAs that use text rather than images.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('textcaptcha_settings_form'),
+    'access arguments' => array('administer CAPTCHA settings'),
+    'type' => MENU_LOCAL_TASK
+  );
   return $items;
 }
 
@@ -47,12 +47,12 @@ function textcaptcha_settings_form() {
     '#title' => t('Number of challenges to keep as backup'),
     '#description' => t('If you cannot contact textcaptcha.com or the service is unavailable, some challenges are kept in the site cache as backup. Select zero to turn this feature off.'),
     '#options' => array(
-      			  0,
-      			  10,
-      			  20,
-      			  30,
-      			  40
-    			  ),
+              0,
+              10,
+              20,
+              30,
+              40
+            ),
     '#default_value' => variable_get('textcaptcha_cache_limit', 10),
   );
   
@@ -64,7 +64,7 @@ function textcaptcha_settings_form() {
 */
 function textcaptcha_settings_form_validate($form, $form_state) {
   $result = drupal_http_request(TEXTCAPTCHA_URL_PREFIX . trim($form_state['values']['textcaptcha_api_key']));
-  if($result->code !== '200') {
+  if ($result->code !== '200') {
     form_set_error('textcaptcha_api_key', t('The API Key did not work or the server cannot contact textcaptcha.com'));
   }
 }
@@ -104,7 +104,7 @@ function textcaptcha_captcha($op, $captcha_type='') {
 *  Retrieves CAPTCHA and possible answer list from the textcaptcha.com service
 */
 function textcaptcha_get_captcha($use_cache = TRUE) {
-  if(variable_get('textcaptcha_cache_limit', 10) == 0) {
+  if (variable_get('textcaptcha_cache_limit', 10) == 0) {
     $use_cache = FALSE;
   }
   if (variable_get('textcaptcha_api_key', FALSE)) {
@@ -124,16 +124,16 @@ function textcaptcha_get_captcha($use_cache = TRUE) {
         }
       }
       $cached_challenges->data[] = array('question' => $question,
-      									 'answers' => $answers);
-      if(count($cached_challenges->data) > variable_get('textcaptcha_cache_limit', 10)) {
-      	array_shift($cached_challenges->data);
+                         'answers' => $answers);
+      if (count($cached_challenges->data) > variable_get('textcaptcha_cache_limit', 10)) {
+        array_shift($cached_challenges->data);
       }
-      if($use_cache) {
-      	cache_set('textcaptcha_cached_challenges', $cached_challenges->data);
+      if ($use_cache) {
+        cache_set('textcaptcha_cached_challenges', $cached_challenges->data);
       }
       return array('question' => $question, 'answers' => $answers);
     }
-    elseif($cached_challenges && $use_cache) {
+    elseif ($cached_challenges && $use_cache) {
       return array_rand($cached_challenges->data);
     }
   }
@@ -152,8 +152,8 @@ function textcaptcha_captcha_validate($solution, $response) {
 */
 function textcaptcha_requirements($phase) {
   $requirements = array();
-  if($phase == 'runtime') {
-    if(variable_get('textcaptcha_api_key', FALSE)) {
+  if ($phase == 'runtime') {
+    if (variable_get('textcaptcha_api_key', FALSE)) {
       $requirements['textcaptcha_api_key'] = array(
         'title' => t('Text CAPTCHA'),
         'value' => t('API Key updated and server contacted'),
@@ -167,7 +167,7 @@ function textcaptcha_requirements($phase) {
                       array('!link' => l('registering at textcaptcha.com', 
                                  'http://textcaptcha.com/register'),
                             '!settings' => l('Text CAPTCHA settings',
-                            	 'admin/user/captcha/textcaptcha'))),
+                               'admin/user/captcha/textcaptcha'))),
         'severity' => REQUIREMENT_WARNING,
       );   
     }
