@@ -134,7 +134,7 @@ function textcaptcha_get_captcha($use_cache = TRUE) {
       return array('question' => $question, 'answers' => $answers);
     }
     elseif($cached_challenges && $use_cache) {
-      return array_rand($cached_challenges->data);
+      return $cached_challenges->data[array_rand($cached_challenges->data)];
     }
   }
   return FALSE;
