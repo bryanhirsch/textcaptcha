@@ -144,6 +144,9 @@ function textcaptcha_get_captcha($use_cache = TRUE) {
 *  Custom CAPTCHA validation callback.
 */
 function textcaptcha_captcha_validate($solution, $response) {
+  if(!unserialize($solution)) {
+    return TRUE;
+  }
   return (in_array(md5(drupal_strtolower(trim($response))), unserialize($solution)));
 }
 
