@@ -1,4 +1,4 @@
-<?php // $Id$
+<?php // $Id: textcaptcha.module,v 1.1.2.2.2.1 2010/12/08 21:34:33 kevee Exp $
 
 /**
 *  @file
@@ -29,11 +29,11 @@ function textcaptcha_menu() {
 */
 function textcaptcha_settings_form() {
   $form = array();
-  
-  $form['instructions']['#value'] = t('To use TextCAPTCHA, you need to get an API key by !link', 
-                      array('!link' => l('registering at textcaptcha.com', 
+
+  $form['instructions']['#value'] = t('To use TextCAPTCHA, you need to get an API key by !link',
+                      array('!link' => l('registering at textcaptcha.com',
                                  'http://textcaptcha.com/register')));
-                      
+
   $form['textcaptcha_api_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Textcaptcha.com API key'),
@@ -41,7 +41,7 @@ function textcaptcha_settings_form() {
     '#default_value' => variable_get('textcaptcha_api_key', ''),
     '#required' => TRUE,
   );
-  
+
   $form['textcaptcha_cache_limit'] = array(
     '#type' => 'select',
     '#title' => t('Number of challenges to keep as backup'),
@@ -55,7 +55,7 @@ function textcaptcha_settings_form() {
             ),
     '#default_value' => variable_get('textcaptcha_cache_limit', 10),
   );
-  
+
   return system_settings_form($form);
 }
 
@@ -93,7 +93,7 @@ function textcaptcha_captcha($op, $captcha_type='') {
         );
         $result['solution'] = serialize($textcaptcha['answers']);
         $result['captcha_validate'] = 'textcaptcha_captcha_validate';
-        
+
         return $result;
       }
     break;
@@ -144,6 +144,9 @@ function textcaptcha_get_captcha($use_cache = TRUE) {
 *  Custom CAPTCHA validation callback.
 */
 function textcaptcha_captcha_validate($solution, $response) {
+  if(!unserialize($solution)) {
+    return TRUE;
+  }
   return (in_array(md5(drupal_strtolower(trim($response))), unserialize($solution)));
 }
 
@@ -163,13 +166,13 @@ function textcaptcha_requirements($phase) {
     else {
        $requirements['textcaptcha_api_key'] = array(
         'title' => t('Text CAPTCHA'),
-        'value' => t('API Key missing. Plese !link for an API key and then update the !settings.', 
-                      array('!link' => l('registering at textcaptcha.com', 
+        'value' => t('API Key missing. Plese !link for an API key and then update the !settings.',
+                      array('!link' => l('registering at textcaptcha.com',
                                  'http://textcaptcha.com/register'),
                             '!settings' => l('Text CAPTCHA settings',
                                'admin/user/captcha/textcaptcha'))),
         'severity' => REQUIREMENT_WARNING,
-      );   
+      );
     }
   }
   return $requirements;
