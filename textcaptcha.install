@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function textcaptcha_install() {
+  $text = t('To set up textCAPTCHA get an API key !here. Then go to the admin
+  configuration page !admin to save your key and retrieve some challenge
+  questions.', 
+    array(
+      '!here' => l('here', 'http://textcaptcha.com/'), 
+      '!admin' => l('here', 'admin/config/people/captcha/textcaptcha'),
+    )
+  );
+  drupal_set_message($text, 'warning');
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function textcaptcha_update_7001() {
+  // Update captcha limit. There was a bug, restricting cache limit to 0, 1, 2,
+  // 3, or 4 (when users were selecting 0, 10, 20, 30, 40).
+  $limit = variable_get('textcaptcha_cache_limit', 0);
+  switch ($limit) {
+    case 0:
+    case 1:
+      variable_set('textcaptcha_cache_limit', 10);
+      break;
+    case 2:
+      variable_set('textcaptcha_cache_limit', 20);
+      break;
+    case 3:
+      variable_set('textcaptcha_cache_limit', 30);
+      break;
+    case 4:
+      variable_set('textcaptcha_cache_limit', 40);
+      break;
+  }
+
+  // Populate cache with some challenges.
+  for ($i = 0; $i < 10; $i++) {
+    if ($challenge = textcaptcha_get_new_challenge()) {
+      textcaptcha_cache_new_challenge($challenge);
+    }
+  }
+}
