@@ -49,7 +49,43 @@ function textcaptcha_settings_form() {
     '#default_value' => variable_get('textcaptcha_cache_limit', 30),
   );
 
+  $form['actions']['text_captcha'] = array(
+    '#type' => 'submit',
+    '#value' => t('Retrieve new captcha challenges'),
+    '#submit' => array('textcaptcha_get_new_challenges'),
+  );
+
   return system_settings_form($form);
+}
+
+/**
+ * Get new challenge questions and cache them.
+ */
+function textcaptcha_get_new_challenges() {
+  $success = 0;
+  for ($i = 0; $i < 10; $i++) {
+    if ($challenge = textcaptcha_get_new_challenge()) {
+      textcaptcha_cache_new_challenge($challenge);
+      $success++;
+    }
+  }
+
+  if ($success < 1) {
+    $text = t('Sorry. After trying !i times, I was unable to retrieve any new
+    challenge questions. Either your API key is bad, you are not online, or the
+    web service you are trying to reach is not responding.', array('!i' => $i));
+    drupal_set_message($text, 'warning');
+  }
+  else {
+    $text = t('Success! You have !success new challenge questions. (!success/!i
+    attempts to retrieve new challenge questions were successful.)',
+      array(
+        '!success' => $success,
+        '!i' => $i,
+      )
+    );
+    drupal_set_message($text, 'success');
+  }
 }
 
 /**
