@@ -86,6 +86,16 @@ function textcaptcha_get_new_challenges() {
     );
     drupal_set_message($text, 'success');
   }
+
+  $count = textcaptcha_cache_count();
+  $text = t('You have !count cached challenge questions.', array('!count' => $count));
+  if ($count < 10) {
+    $status = 'warning';  
+  }
+  else {
+    $status = 'notice';  
+  }
+  drupal_set_message($text, $status);
 }
 
 /**
@@ -269,6 +279,20 @@ function textcaptcha_cache_new_challenge($challenge) {
     $data = array($challenge);
   }
   cache_set('textcaptcha_challenges', $data);
+}
+
+/**
+ * Return count of cached challenge questions.
+ */
+function textcaptcha_cache_count() {
+  if ($cache = cache_get('textcaptcha_challenges')) {
+    $data = $cache->data;
+    $count = count($data);
+  }
+  else {
+    $count = 0;
+  }
+  return $count;
 }
 
 /**
