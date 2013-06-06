@@ -1,4 +1,4 @@
-<?php // $Id: textcaptcha.module,v 1.1.2.2.2.1 2010/12/08 21:34:33 kevee Exp $
+<?php 
 
 /**
 *  @file
@@ -112,10 +112,13 @@ function textcaptcha_get_challenge() {
     $key = array_rand($challenges);
     $challenge = $challenges[$key];
   }
-  // If no cached challenges are available try and get one on the fly from a web service. 
   else {
+    // If no cached challenges are available try and get one on the fly
+    // from web service. 
     $challenge = textcaptcha_get_new_challenge();
-    textcaptcha_cache_new_challenge($challenge);
+    if ($challenge) {
+      textcaptcha_cache_new_challenge($challenge);
+    }
   }
 
   // Handle empty response.
@@ -234,9 +237,13 @@ function textcaptcha_cache_new_challenge($challenge) {
 
 /**
  * Retrieve a new challenge from textcaptcha web service and cache it.
+ *
+ * @return
+ *  $challenge array or FALSE
  */
 function textcaptcha_get_new_challenge() {
   // Attempt to retrieve a new challenge from the web service.
+  $success = FALSE;
   for ($i = 1; $i <= 10; $i++) {
     $response = textcaptcha_http_request();
     if (!$response->code == 200) {
@@ -246,21 +253,23 @@ function textcaptcha_get_new_challenge() {
     }
     else {
       // Log success.
+      $success = TRUE;
       $text = t('Successfully retrieved new textcaptcha challenge question on attempt !n', array('!n' => $i));
       watchdog('textcaptcha', $text);
       break;  
     }
   }
 
-  // Parse response.
-  $challenge = textcaptcha_parse_data($response->data);
-
-  return $challenge;
+  return ($success) ? textcaptcha_parse_data($response->data) : FALSE;
 }
 
 /**
  * Wrapper around textcaptcha API call.
+ *
+ * @return array
+ *  Response from drupal_http_request() to textcaptcha web service.
  */
 function textcaptcha_http_request() {
   $response = drupal_http_request(TEXTCAPTCHA_URL_PREFIX . trim(variable_get('textcaptcha_api_key', '')));
+  return $response;
 }
