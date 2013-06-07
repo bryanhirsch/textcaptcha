@@ -59,6 +59,23 @@ function textcaptcha_settings_form() {
 }
 
 /**
+ * Implements hook_form_alter().
+ */
+function textcaptcha_form_alter(&$form, &$form_state, $form_id) {
+  // Confirm the form is using captcha AND uses Text Captcha for challenges.
+  module_load_include('inc', 'captcha');
+  $captcha_point = captcha_get_form_id_setting($form_id);
+  if ($captcha_point && $captcha_point->captcha_type == "Text Captcha") {
+    // Check to see if Captcha module set a Challenge Description.
+    if (in_array('#description', array_keys($form['captcha']))) {
+      // Unset it. We prepend this in front of the challenge question itself for
+      // accessibility by screen readers.
+      unset($form['captcha']['#description']);
+    }
+  }
+}
+
+/**
  * Get new challenge questions and cache them.
  */
 function textcaptcha_get_new_challenges() {
@@ -113,16 +130,24 @@ function textcaptcha_settings_form_validate($form, $form_state) {
  */
 function textcaptcha_captcha($op, $captcha_type='') {
   switch ($op) {
+
     case 'list' :
       return array('Text Captcha');
       break;
+
     case 'generate' :
+      // Load captcha.inc so we can use it to get the Challenge Description.
+      module_load_include('inc', 'captcha');
+      $challenge_description = _captcha_get_description();
+
       $result = array();
       if ($captcha_type == 'Text Captcha') {
         $challenge = textcaptcha_get_challenge();
         $result['form']['captcha_response'] = array(
           '#type' => 'textfield',
-          '#title' => $challenge['question'],
+          // For accessibility put the challenge description in front of the
+          // challenge. This way it will be read by screen readers.
+          '#title' => $challenge_description . ': ' . $challenge['question'],
           '#description' => t('Question text provided by !link',
                               array('!link' => l('textcaptcha.com', 'http://textcaptcha.com'))
                              ),
@@ -136,6 +161,7 @@ function textcaptcha_captcha($op, $captcha_type='') {
         return $result;
       }
     break;
+
   }
 }
 
