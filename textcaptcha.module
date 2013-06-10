@@ -34,6 +34,14 @@ function textcaptcha_settings_form() {
                       array('!link' => l('registering at textcaptcha.com',
                                  'http://textcaptcha.com/register')));
 
+  $form['textcaptcha_challenge_description'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Text Captcha challenge description'),
+    '#description' => t("Text inserted here will be prepended before the challenge question. This can be helpful for accessibility. Screen readers do not ready Drupal form element descriptions by default (which is where CAPTCHA module's default Challenge Description goes)."),
+    '#default_value' => variable_get('textcaptcha_challenge_description', ''),
+    '#required' => TRUE,
+  );
+
   $form['textcaptcha_api_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Textcaptcha.com API key'),
@@ -56,23 +64,6 @@ function textcaptcha_settings_form() {
   );
 
   return system_settings_form($form);
-}
-
-/**
- * Implements hook_form_alter().
- */
-function textcaptcha_form_alter(&$form, &$form_state, $form_id) {
-  // Confirm the form is using captcha AND uses Text Captcha for challenges.
-  module_load_include('inc', 'captcha');
-  $captcha_point = captcha_get_form_id_setting($form_id);
-  if ($captcha_point && $captcha_point->captcha_type == "Text Captcha") {
-    // Check to see if Captcha module set a Challenge Description.
-    if (in_array('#description', array_keys($form['captcha']))) {
-      // Unset it. We prepend this in front of the challenge question itself for
-      // accessibility by screen readers.
-      unset($form['captcha']['#description']);
-    }
-  }
 }
 
 /**
@@ -136,9 +127,7 @@ function textcaptcha_captcha($op, $captcha_type='') {
       break;
 
     case 'generate' :
-      // Load captcha.inc so we can use it to get the Challenge Description.
-      module_load_include('inc', 'captcha');
-      $challenge_description = _captcha_get_description();
+      $challenge_description = variable_get('textcaptcha_challenge_description', FALSE);
 
       $result = array();
       if ($captcha_type == 'Text Captcha') {
@@ -147,7 +136,7 @@ function textcaptcha_captcha($op, $captcha_type='') {
           '#type' => 'textfield',
           // For accessibility put the challenge description in front of the
           // challenge. This way it will be read by screen readers.
-          '#title' => $challenge_description . ': ' . $challenge['question'],
+          '#title' => ($challenge_description) ? $challenge_description . ' ' . $challenge['question'] : $challenge['question'],
           '#description' => t('Question text provided by !link',
                               array('!link' => l('textcaptcha.com', 'http://textcaptcha.com'))
                              ),
