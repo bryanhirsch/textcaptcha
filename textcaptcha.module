@@ -142,7 +142,7 @@ function textcaptcha_captcha($op, $captcha_type='') {
           '#maxlength' => 50,
           '#required' => TRUE,
           '#prefix' => variable_get('textcaptcha_challenge_description', '') . '<span class="textcaptcha-question">',
-          '#sufix' => '</span>',
+          '#suffix' => '</span>',
         );
         $result['solution'] = serialize($challenge['answers']);
         $result['captcha_validate'] = 'textcaptcha_captcha_validate';
