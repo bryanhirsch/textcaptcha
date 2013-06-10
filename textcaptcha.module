@@ -169,7 +169,7 @@ function textcaptcha_get_challenge() {
 
   // Try to retreive a cached captcha challenge question.
   if ($cache = cache_get('textcaptcha_challenges')) {
-    $challenges = $cache->data;
+    $challenges = array_filter($cache->data);
     $key = array_rand($challenges);
     $challenge = $challenges[$key];
   }
@@ -293,6 +293,8 @@ function textcaptcha_cache_new_challenge($challenge) {
   else {
     $data = array($challenge);
   }
+  // Use array_filter in case there are empty elements in $data.
+  $data = array_filter($data);
   cache_set('textcaptcha_challenges', $data);
 }
 
