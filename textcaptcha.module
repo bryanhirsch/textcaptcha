@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /**
 *  @file
@@ -90,10 +90,10 @@ function textcaptcha_get_new_challenges() {
   $count = textcaptcha_cache_count();
   $text = t('You have !count cached challenge questions.', array('!count' => $count));
   if ($count < 10) {
-    $status = 'warning';  
+    $status = 'warning';
   }
   else {
-    $status = 'notice';  
+    $status = 'notice';
   }
   drupal_set_message($text, $status);
 }
@@ -160,7 +160,7 @@ function textcaptcha_get_challenge() {
   }
   else {
     // If no cached challenges are available try and get one on the fly
-    // from web service. 
+    // from web service.
     $challenge = textcaptcha_get_new_challenge();
     if ($challenge) {
       textcaptcha_cache_new_challenge($challenge);
@@ -318,7 +318,7 @@ function textcaptcha_get_new_challenge() {
       $success = TRUE;
       $text = t('Successfully retrieved new textcaptcha challenge question on attempt !n', array('!n' => $i));
       watchdog('textcaptcha', $text);
-      break;  
+      break;
     }
   }
 
