@@ -34,6 +34,14 @@ function textcaptcha_settings_form() {
                       array('!link' => l('registering at textcaptcha.com',
                                  'http://textcaptcha.com/register')));
 
+  $form['textcaptcha_challenge_description'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Text Captcha challenge description'),
+    '#description' => t("Text inserted here will be prepended before the challenge question. This can be helpful for accessibility. Screen readers do not ready Drupal form element descriptions by default (which is where CAPTCHA module's default Challenge Description goes)."),
+    '#default_value' => variable_get('textcaptcha_challenge_description', ''),
+    '#required' => TRUE,
+  );
+
   $form['textcaptcha_api_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Textcaptcha.com API key'),
@@ -90,6 +98,10 @@ function textcaptcha_captcha($op, $captcha_type='') {
           '#size' => 50,
           '#maxlength' => 50,
           '#required' => TRUE,
+          // For accessibility put the challenge description in front of the
+          // challenge. This way it will be read by screen readers.
+          '#prefix' => variable_get('textcaptcha_challenge_description', '') . '<span class="textcaptcha-question">',
+          '#suffix' => '</span>',
         );
         $result['solution'] = serialize($textcaptcha['answers']);
         $result['captcha_validate'] = 'textcaptcha_captcha_validate';
