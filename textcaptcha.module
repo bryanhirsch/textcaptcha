@@ -127,8 +127,6 @@ function textcaptcha_captcha($op, $captcha_type='') {
       break;
 
     case 'generate' :
-      $challenge_description = variable_get('textcaptcha_challenge_description', FALSE);
-
       $result = array();
       if ($captcha_type == 'Text Captcha') {
         $challenge = textcaptcha_get_challenge();
@@ -136,13 +134,15 @@ function textcaptcha_captcha($op, $captcha_type='') {
           '#type' => 'textfield',
           // For accessibility put the challenge description in front of the
           // challenge. This way it will be read by screen readers.
-          '#title' => ($challenge_description) ? $challenge_description . ' ' . $challenge['question'] : $challenge['question'],
+          '#title' => $challenge['question'],
           '#description' => t('Question text provided by !link',
                               array('!link' => l('textcaptcha.com', 'http://textcaptcha.com'))
                              ),
           '#size' => 50,
           '#maxlength' => 50,
           '#required' => TRUE,
+          '#prefix' => variable_get('textcaptcha_challenge_description', '') . '<span class="textcaptcha-question">',
+          '#sufix' => '</span>',
         );
         $result['solution'] = serialize($challenge['answers']);
         $result['captcha_validate'] = 'textcaptcha_captcha_validate';
