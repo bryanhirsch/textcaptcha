@@ -132,8 +132,6 @@ function textcaptcha_captcha($op, $captcha_type='') {
         $challenge = textcaptcha_get_challenge();
         $result['form']['captcha_response'] = array(
           '#type' => 'textfield',
-          // For accessibility put the challenge description in front of the
-          // challenge. This way it will be read by screen readers.
           '#title' => $challenge['question'],
           '#description' => t('Question text provided by !link',
                               array('!link' => l('textcaptcha.com', 'http://textcaptcha.com'))
@@ -141,6 +139,8 @@ function textcaptcha_captcha($op, $captcha_type='') {
           '#size' => 50,
           '#maxlength' => 50,
           '#required' => TRUE,
+          // For accessibility put the challenge description in front of the
+          // challenge. This way it will be read by screen readers.
           '#prefix' => variable_get('textcaptcha_challenge_description', '') . '<span class="textcaptcha-question">',
           '#suffix' => '</span>',
         );
